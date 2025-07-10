@@ -1,0 +1,53 @@
+{
+  "name": "@venture23/aleo-oracle-sdk",
+  "version": "1.0.0",
+  "description": "Aleo Oracle SDK",
+  "homepage": "https://aleo-oracle-docs.surge.sh",
+  "author": {
+    "name": "Venture23",
+    "url": "https://github.com/venture23"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/venture23-aleo/aleo-oracle-sdk-js.git"
+  },
+  "bugs": "https://github.com/venture23-aleo/aleo-oracle-sdk-js/issues",
+  "license": "GPL-3.0",
+  "keywords": [
+    "backend",
+    "aleo",
+    "cryptography",
+    "blockchain",
+    "decentralized",
+    "zero-knowledge",
+    "oracle"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "README.md",
+    "LICENSE.md",
+    "dist/*",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "rimraf dist && rollup -c rollup.config.js",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.5",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.24.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.2.2"
+  }
+}
