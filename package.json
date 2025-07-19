@@ -1,5 +1,5 @@
 {
-  "name": "@venture23/aleo-oracle-sdk",
+  "name": "@venture23-aleo/aleo-oracle-sdk",
   "version": "1.0.0",
   "description": "Aleo Oracle SDK",
   "homepage": "https://aleo-oracle-docs.surge.sh",
