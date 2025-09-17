@@ -21,6 +21,7 @@ import {
   handleAttestationResponse, handleInfoResponse, requestBackendMesh, resolveBackends,
 } from './request';
 import fetch, { type Response } from './fetch';
+import { EnclavesInfoWithErrors } from './types/attestation';
 
 /**
  * @example
@@ -136,7 +137,7 @@ export default class OracleClient {
    *
    * @throws {AttestationError | Error}
    */
-  async enclavesInfo(options?: InfoOptions): Promise<EnclaveInfo[]> {
+  async enclavesInfo(options?: InfoOptions): Promise<EnclavesInfoWithErrors> {
     const API_ENDPOINT = '/info';
 
     let abortSignal: AbortSignal|undefined;
@@ -180,7 +181,7 @@ export default class OracleClient {
       throw new Error(`all info requests have failed: ${JSON.stringify(errors)}`);
     }
 
-    return enclavesInfo;
+    return { enclavesInfo, errors };
   }
 
   /**
