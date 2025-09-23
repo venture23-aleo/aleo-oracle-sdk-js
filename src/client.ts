@@ -53,7 +53,7 @@ export default class OracleClient {
     }
 
     // we may modify the config, so we create a copy
-    const conf = { ...config };
+    const conf = { ...config, notarizer: { ...config?.notarizer }, verifier: { ...config?.verifier } };
 
     // Use the configured notarizer backend, add default fetch options if they are missing.
     // Use default notarization backends if the configuration is missing.
