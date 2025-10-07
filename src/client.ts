@@ -1,26 +1,28 @@
 import type {
-  ClientConfig,
-  InfoOptions,
-  EnclaveInfo,
-  NotarizationOptions,
-  AttestationResponse,
-  DebugRequestResponse,
   AttestationRequest,
+  AttestationResponse,
+  ClientConfig,
   CustomBackendConfig,
+  DebugRequestResponse,
+  EnclaveInfo,
+  InfoOptions,
+  NotarizationOptions,
 } from './types';
 
-import {
-  DEFAULT_FETCH_OPTIONS, DEFAULT_NOTARIZATION_BACKENDS, DEFAULT_NOTARIZATION_OPTIONS, DEFAULT_TIMEOUT_MS,
-  DEFAULT_VERIFICATION_BACKEND, DEFAULT_NOTARIZATION_HEADERS,
-} from './defaults';
-import { AttestationIntegrityError } from './errors';
 import {
   getFullAddress, getOrResolveFullAddress, trimPath, trimUrl,
 } from './address';
 import {
+  DEFAULT_FETCH_OPTIONS, DEFAULT_NOTARIZATION_BACKENDS,
+  DEFAULT_NOTARIZATION_HEADERS,
+  DEFAULT_NOTARIZATION_OPTIONS, DEFAULT_TIMEOUT_MS,
+  DEFAULT_VERIFICATION_BACKEND,
+} from './defaults';
+import { AttestationIntegrityError } from './errors';
+import fetch, { type Response } from './fetch';
+import {
   handleAttestationResponse, handleInfoResponse, requestBackendMesh, resolveBackends,
 } from './request';
-import fetch, { type Response } from './fetch';
 
 /**
  * @example
@@ -379,7 +381,8 @@ export default class OracleClient {
 
     settledResult.forEach((result) => {
       if (result.status === 'rejected') {
-        errors.push(JSON.stringify(result.reason, ['message', ...Object.keys(result.reason)]));
+        const reason = result.reason instanceof Error ? result.reason : new Error(String(result.reason || 'unknown reason'));
+        errors.push(JSON.stringify(reason, ['message', ...Object.keys(reason)]));
         return;
       }
 
