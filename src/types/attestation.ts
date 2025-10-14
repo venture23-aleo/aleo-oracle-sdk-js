@@ -471,4 +471,6 @@ export type EnclaveInfo = {
   signerPubKey: string;
 }
 
+export type EnclavesInfoWithErrors = { enclavesInfo?: EnclaveInfo[]; errors?: string[] };
+
 export type DebugRequestResponseWithError = DebugRequestResponse & AttestationErrorResponse;

@@ -21,6 +21,7 @@ import type {
   NitroInfo,
   NitroDocument,
   NitroReportExtras,
+  EnclavesInfoWithErrors,
 } from './attestation';
 
 export type {
@@ -44,4 +45,5 @@ export type {
   NitroInfo,
   NitroDocument,
   NitroReportExtras,
+  EnclavesInfoWithErrors,
 };
