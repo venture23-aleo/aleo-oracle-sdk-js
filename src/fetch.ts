@@ -5,6 +5,7 @@ import type { IncomingMessage, OutgoingHttpHeaders } from 'http';
 import type { CustomBackendConfig } from './types';
 
 import { getFullAddress } from './address';
+import { MAX_BODY_SIZE } from './defaults';
 
 interface FetchResponse {
   text(): Promise<string>;
@@ -82,8 +83,19 @@ export default async function fetch(backend: CustomBackendConfig, ip: string, pa
   return new Promise((resolve, reject) => {
     const headersDict: Record<string, string> = {};
 
+    let req: http.ClientRequest;
+
+    let received = 0;
+
     const handleResponse = (res: IncomingMessage) => {
+      if (res.headers['content-length'] && parseInt(res.headers['content-length'], 10) > MAX_BODY_SIZE) {
+        req.destroy(new Error('Response body too large'));
+      }
       res.on('data', (d) => {
+        received += d.length;
+        if (received > MAX_BODY_SIZE) {
+          req.destroy(new Error('Response body too large'));
+        }
         data += d;
       });
 
@@ -103,7 +115,6 @@ export default async function fetch(backend: CustomBackendConfig, ip: string, pa
       });
     };
 
-    let req;
     if (backend.https) {
       req = https.request(reqObj, handleResponse);
     } else {
