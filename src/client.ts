@@ -1,26 +1,29 @@
 import type {
-  ClientConfig,
-  InfoOptions,
-  EnclaveInfo,
-  NotarizationOptions,
-  AttestationResponse,
-  DebugRequestResponse,
   AttestationRequest,
+  AttestationResponse,
+  ClientConfig,
   CustomBackendConfig,
+  DebugRequestResponse,
+  EnclaveInfo,
+  InfoOptions,
+  NotarizationOptions,
 } from './types';
 
-import {
-  DEFAULT_FETCH_OPTIONS, DEFAULT_NOTARIZATION_BACKENDS, DEFAULT_NOTARIZATION_OPTIONS, DEFAULT_TIMEOUT_MS,
-  DEFAULT_VERIFICATION_BACKEND, DEFAULT_NOTARIZATION_HEADERS,
-} from './defaults';
-import { AttestationIntegrityError } from './errors';
 import {
   getFullAddress, getOrResolveFullAddress, trimPath, trimUrl,
 } from './address';
 import {
+  DEFAULT_FETCH_OPTIONS, DEFAULT_NOTARIZATION_BACKENDS,
+  DEFAULT_NOTARIZATION_HEADERS,
+  DEFAULT_NOTARIZATION_OPTIONS, DEFAULT_TIMEOUT_MS,
+  DEFAULT_VERIFICATION_BACKEND,
+} from './defaults';
+import { AttestationIntegrityError } from './errors';
+import fetch, { type Response } from './fetch';
+import {
   handleAttestationResponse, handleInfoResponse, requestBackendMesh, resolveBackends,
 } from './request';
-import fetch, { type Response } from './fetch';
+import { EnclavesInfoWithErrors } from './types/attestation';
 
 /**
  * @example
@@ -53,7 +56,7 @@ export default class OracleClient {
     }
 
     // we may modify the config, so we create a copy
-    const conf = { ...config };
+    const conf = { ...config, notarizer: { ...config?.notarizer }, verifier: { ...config?.verifier } };
 
     // Use the configured notarizer backend, add default fetch options if they are missing.
     // Use default notarization backends if the configuration is missing.
@@ -136,7 +139,7 @@ export default class OracleClient {
    *
    * @throws {AttestationError | Error}
    */
-  async enclavesInfo(options?: InfoOptions): Promise<EnclaveInfo[]> {
+  async enclavesInfo(options?: InfoOptions): Promise<EnclavesInfoWithErrors> {
     const API_ENDPOINT = '/info';
 
     let abortSignal: AbortSignal|undefined;
@@ -180,7 +183,7 @@ export default class OracleClient {
       throw new Error(`all info requests have failed: ${JSON.stringify(errors)}`);
     }
 
-    return enclavesInfo;
+    return { enclavesInfo, errors };
   }
 
   /**
@@ -379,7 +382,8 @@ export default class OracleClient {
 
     settledResult.forEach((result) => {
       if (result.status === 'rejected') {
-        errors.push(JSON.stringify(result.reason, ['message', ...Object.keys(result.reason)]));
+        const reason = result.reason instanceof Error ? result.reason : new Error(String(result.reason || 'unknown reason'));
+        errors.push(JSON.stringify(reason, ['message', ...Object.keys(reason)]));
         return;
       }
 
