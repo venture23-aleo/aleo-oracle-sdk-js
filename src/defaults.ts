@@ -49,7 +49,7 @@ export const DEFAULT_VERIFICATION_BACKEND: CustomBackendConfig = Object.freeze({
   apiPrefix: '',
   resolve: true,
   init: DEFAULT_FETCH_OPTIONS,
-};
+});
 
 export const MAX_BODY_SIZE = 5 * 1024 * 1024; // 5 MB
 
