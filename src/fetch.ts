@@ -1,5 +1,6 @@
-import https from 'node:https';
+import fs from 'node:fs';
 import http from 'node:http';
+import https from 'node:https';
 
 import type { IncomingMessage, OutgoingHttpHeaders } from 'http';
 import type { CustomBackendConfig } from './types';
@@ -66,10 +67,10 @@ export class Response implements FetchResponse {
 export default async function fetch(backend: CustomBackendConfig, ip: string, path: string, init: RequestInit): Promise<Response> {
   let data = '';
 
-  const reqObj = {
+    const reqObj: https.RequestOptions & http.RequestOptions & { headers: OutgoingHttpHeaders } = {
     host: ip,
     path,
-    servername: backend.address,
+      servername: backend.tls?.servername || backend.address,
     port: backend.port,
     method: init.method,
     lookup: backend.resolve ? () => {} : undefined,
@@ -105,12 +106,22 @@ export default async function fetch(backend: CustomBackendConfig, ip: string, pa
 
     let req;
     if (backend.https) {
-      req = https.request(reqObj, handleResponse);
+      const tls = backend.tls ?? {};
+        const httpsOpts: https.RequestOptions = {
+          ...reqObj,
+          cert: tls.certPath ? fs.readFileSync(tls.certPath) : undefined,
+          key: tls.keyPath ? fs.readFileSync(tls.keyPath) : undefined,
+          ca: Array.isArray(tls.caPath)
+            ? tls.caPath.map((p) => fs.readFileSync(p))
+            : (tls.caPath ? fs.readFileSync(tls.caPath) : undefined),
+          rejectUnauthorized: tls.rejectUnauthorized ?? true,
+      };
+      req = https.request(httpsOpts, handleResponse);
     } else {
       req = http.request(reqObj, handleResponse);
     }
 
-    req.on('error', (e) => reject(e));
+  req.on('error', (e: Error) => reject(e));
 
     if (init.body) {
       req.write(init.body);

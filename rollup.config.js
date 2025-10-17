@@ -14,6 +14,7 @@ export default {
     'node:http',
     'node:https',
     'node:net',
+    'node:fs',
   ],
   plugins: [
     typescript({

@@ -1,7 +1,8 @@
 import type {
-  ClientConfig,
-  CustomBackendConfig,
-  CustomBackendAllowedFetchOptions,
+    ClientConfig,
+    CustomBackendAllowedFetchOptions,
+    CustomBackendConfig,
+    TlsConfig,
 } from './config';
 
 import type {
@@ -25,10 +26,10 @@ import type {
 } from './attestation';
 
 export type {
+
   ClientConfig,
   CustomBackendConfig,
   CustomBackendAllowedFetchOptions,
-
   AttestationErrorResponse,
   AttestationRequest,
   AttestationResponse,
