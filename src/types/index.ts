@@ -47,4 +47,5 @@ export type {
   NitroDocument,
   NitroReportExtras,
   EnclavesInfoWithErrors,
+  TlsConfig,
 };
