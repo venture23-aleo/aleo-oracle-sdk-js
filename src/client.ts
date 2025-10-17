@@ -23,6 +23,7 @@ import fetch, { type Response } from './fetch';
 import {
   handleAttestationResponse, handleInfoResponse, requestBackendMesh, resolveBackends,
 } from './request';
+import { EnclavesInfoWithErrors } from './types/attestation';
 
 /**
  * @example
@@ -55,7 +56,7 @@ export default class OracleClient {
     }
 
     // we may modify the config, so we create a copy
-    const conf = { ...config };
+    const conf = { ...config, notarizer: { ...config?.notarizer }, verifier: { ...config?.verifier } };
 
     // Use the configured notarizer backend, add default fetch options if they are missing.
     // Use default notarization backends if the configuration is missing.
@@ -138,7 +139,7 @@ export default class OracleClient {
    *
    * @throws {AttestationError | Error}
    */
-  async enclavesInfo(options?: InfoOptions): Promise<EnclaveInfo[]> {
+  async enclavesInfo(options?: InfoOptions): Promise<EnclavesInfoWithErrors> {
     const API_ENDPOINT = '/info';
 
     let abortSignal: AbortSignal|undefined;
@@ -182,7 +183,7 @@ export default class OracleClient {
       throw new Error(`all info requests have failed: ${JSON.stringify(errors)}`);
     }
 
-    return enclavesInfo;
+    return { enclavesInfo, errors };
   }
 
   /**
