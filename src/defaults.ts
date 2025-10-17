@@ -50,3 +50,6 @@ export const DEFAULT_VERIFICATION_BACKEND: CustomBackendConfig = {
   resolve: true,
   init: DEFAULT_FETCH_OPTIONS,
 };
+
+export const MAX_BODY_SIZE = 5 * 1024 * 1024; // 10 MB
+
