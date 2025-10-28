@@ -4,3 +4,7 @@ dist/
 #dev
 build-dev
 .vscode
+
+client.crt
+client.key
+ca.crt

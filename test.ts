@@ -1,12 +1,26 @@
-import { OracleClient } from './dist/index.js'
+import { CustomBackendConfig, OracleClient } from './dist/index.js'
 
 (async () => {
 
-    const notarizer = {
+    // const notarizer = {
+    //     address: '130.33.96.108',
+    //     port: 8000,
+    //     https: false,
+    //     resolve: false,
+    // }
+
+    const notarizer: CustomBackendConfig = {
         address: '20.83.185.145',
         port: 8094,
-        https: false,
+        https: true,
         resolve: false,
+        tls: {
+            certPath: 'client.crt',
+            keyPath: 'client.key',
+            caPath: 'ca.crt',
+            rejectUnauthorized: true,
+            servername: 'nginx-mtls-proxy',
+        },
     }
 
     const verifier = {
