@@ -113,14 +113,9 @@ export default class OracleClient {
    *
    * @throws {AttestationError | AttestationIntegrityError | Error}
    */
-  async notarize(req: AttestationRequest, options: NotarizationOptions = DEFAULT_NOTARIZATION_OPTIONS): Promise<AttestationResponse[]> {
+  async notarize(req: AttestationRequest | AttestationRequest[], options: NotarizationOptions = DEFAULT_NOTARIZATION_OPTIONS): Promise<AttestationResponse[]> {
     const attestations = await this.createAttestation(req, { timeout: options.timeout, debug: false }) as AttestationResponse[];
-    if (req.url.startsWith('price_feed:')) {
-      const priceFeed = req.url.split(':')[1]
-      this.log(`OracleClient: attested ${priceFeed} price using ${this.#oracleBackends.length} attesters`);
-    } else {
-      this.log(`OracleClient: attested ${new URL(`https://${req.url}`).host} using ${this.#oracleBackends.length} attesters`);
-    }
+    this.log(`OracleClient: attested ${Array.isArray(req) ? req.map((r) => r.url).join(', ') : req.url} using ${this.#oracleBackends.length} attesters`);
 
     return this.handleAttestations(attestations, options);
   }
@@ -130,7 +125,7 @@ export default class OracleClient {
    *
    * @throws {DebugAttestationError | Error}
    */
-  async testSelector(req: AttestationRequest, timeout: number): Promise<DebugRequestResponse[]> {
+  async testSelector(req: AttestationRequest | AttestationRequest[], timeout: number): Promise<DebugRequestResponse[]> {
     return this.createAttestation(req, { timeout, debug: true }) as Promise<DebugRequestResponse[]>;
   }
 
@@ -286,20 +281,17 @@ export default class OracleClient {
    * @throws {AttestationError | DebugAttestationError | Error}
    */
   private async createAttestation(
-    req: AttestationRequest,
+    req: AttestationRequest | AttestationRequest[],
     options: { timeout?: number; debug: boolean } = { timeout: DEFAULT_TIMEOUT_MS, debug: false },
   ): Promise<(AttestationResponse | DebugRequestResponse)[]> {
     const API_ENDPOINT = '/notarize';
 
-    // construct oracle HTTP request body
-    const attestReq: AttestationRequest & { debugRequest: boolean } = {
-      ...req,
-      requestHeaders: {
-        ...DEFAULT_NOTARIZATION_HEADERS,
-        ...(req.requestHeaders ?? {}),
-      },
-      debugRequest: options.debug,
-    };
+    let attestReq: AttestationRequest & { debugRequest: boolean } | AttestationRequest[] & { debugRequest: boolean };
+    if (Array.isArray(req)) {
+      attestReq = req.map((r) => ({ ...r, requestHeaders: { ...DEFAULT_NOTARIZATION_HEADERS, ...r.requestHeaders ?? {} }, debugRequest: options.debug })) as unknown as AttestationRequest[] & { debugRequest: boolean };
+    } else {
+      attestReq = { ...req, requestHeaders: { ...DEFAULT_NOTARIZATION_HEADERS, ...req.requestHeaders ?? {} }, debugRequest: options.debug };
+    }
 
     let abortSignal: AbortSignal|undefined;
 
