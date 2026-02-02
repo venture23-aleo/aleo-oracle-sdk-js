@@ -214,7 +214,7 @@ export type AttestationResponse = {
   /**
    * Attestation Report in Base64 encoding, created by the Trusted Execution Environment using the extracted data.
    */
-  attestationReport: string;
+  attestationReport?: string;
 
   /**
    * Which TEE produced an attestation report.
@@ -226,17 +226,17 @@ export type AttestationResponse = {
    *
    * The data is always a string, as seen in the raw HTTP response.
    */
-  attestationData: string;
+  attestationData?: string;
 
   /**
    * Full response body received in the attestation target's response.
    */
-  responseBody: string;
+  responseBody?: string;
 
   /**
    * Status code of the attestation target's response.
    */
-  responseStatusCode: number;
+  responseStatusCode?: number;
 
   /**
    * 32 hex-encoded bytes that were used by AWS Nitro as nonce to create an attestation report. Will be empty in case of SGX.
@@ -256,7 +256,49 @@ export type AttestationResponse = {
   /**
    * Original attestation request.
    */
+  attestationRequest?: Readonly<AttestationRequest>
+
+  /**
+   * Attestation results for multiple requests.
+   */
+  attestationResults?: AttestationResult[] | undefined;
+};
+
+
+/**
+ * Attestation result for a single request.
+ */
+export type AttestationResult = {
+  /**
+   * Unix timestamp of attestation date time as seen by the server.
+   */
+  timestamp: number;
+
+  /**
+   * Status code of the attestation target's response.
+   */
+  responseStatusCode: number;
+
+/**
+ * Attestation request that was used to create the attestation result.
+ */
   attestationRequest: Readonly<AttestationRequest>;
+
+  /**
+   * Attestation data that was extracted from the attestation target's response.
+   */
+  attestationData: string;
+
+  /**
+   * Full response body received in the attestation target's response.
+   */
+  responseBody: string;
+
+  /**
+   * Request hash of the attestation request.
+   */
+  requestHash?: string;
+
 };
 
 export type AttestationErrorResponse = {
